@@ -7,7 +7,7 @@
 #define BASS_LOAD	0x7AAB
 #define BASS_STOP_STREAM 0x7AAC
 #define BASS_PLAY_MOD	0x7ABB
-#define BASS_STOP_MOD	0x7ABA
+#define BASS_STOP_MOD	0x7AB1
 
 #define CLEO_VERSION_MAIN    2
 #define CLEO_VERSION_MAJOR   0
@@ -20,7 +20,7 @@ tScriptVar *Params;
 
 int device = -1;
 int freq = 44100;
-int loop;
+int loop = 0;
 HSTREAM streamHandle;
 HMUSIC musicHandle;
 
@@ -81,7 +81,7 @@ eOpcodeResult WINAPI PlayStream(CScript* script)
 	BASS_ChannelPlay(streamHandle, FALSE);
 
 	if(loop == 1) {
-		BASS_ChannelFlags(streamHandle, BASS_SAMPLE_LOOP, 0);
+		BASS_ChannelFlags(streamHandle, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP);
 	} 
 
 	return OR_CONTINUE;
