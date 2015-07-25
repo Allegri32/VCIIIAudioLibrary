@@ -7,6 +7,7 @@
 #define BASS_STOP_STREAM 0x0AAD
 #define BASS_PLAY_MOD	0x7AAA
 #define BASS_STOP_MOD	0x7AAB
+#define BASS_PLAY_SFX	0x7AAC
 
 #define CLEO_VERSION_MAIN    2
 #define CLEO_VERSION_MAJOR   0
@@ -21,8 +22,34 @@ int device = -1;
 int freq = 44100;
 int loop = 0;
 HSTREAM streamHandle;
+HSTREAM sfxHandle;
 HMUSIC musicHandle;
 BOOL isBASSLoaded = FALSE;
+
+eOpcodeResult WINAPI SFXPlayer(CScript* script)
+{
+	script->Collect(1);
+
+	char sfxpath[100];
+
+	strcpy_s(sfxpath, Params[0].cVar); 
+
+	if(isBASSLoaded == FALSE) {
+		BASS_Init(device, freq, 0, 0, NULL);
+		isBASSLoaded = TRUE;
+	}
+
+	if(BASS_ChannelIsActive(sfxHandle) == BASS_ACTIVE_PLAYING) {
+		BASS_ChannelStop(sfxHandle);
+		BASS_StreamFree(sfxHandle);
+		sfxHandle = NULL;
+	}
+
+	sfxHandle = BASS_StreamCreateFile(FALSE, sfxpath, 0, 0, 0);
+	BASS_ChannelPlay(sfxHandle, FALSE);
+
+	return OR_CONTINUE;
+}
 
 eOpcodeResult WINAPI StopMOD(CScript* script)
 {
@@ -111,6 +138,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
 		Opcodes::RegisterOpcode(BASS_STOP_STREAM, StopStream);
 		Opcodes::RegisterOpcode(BASS_PLAY_MOD, PlayMOD);
 		Opcodes::RegisterOpcode(BASS_STOP_MOD, StopMOD);
+		Opcodes::RegisterOpcode(BASS_PLAY_SFX, SFXPlayer);
 	}
 	return TRUE;
 }
