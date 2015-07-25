@@ -3,10 +3,10 @@
 #include "stdafx.h"
 #include <stdio.h>
 
-#define BASS_PLAY_STREAM 	0x7AAA
-#define BASS_STOP_STREAM 0x7AAC
-#define BASS_PLAY_MOD	0x7ABB
-#define BASS_STOP_MOD	0x7AB1
+#define BASS_PLAY_STREAM 	0x0AAC
+#define BASS_STOP_STREAM 0x0AAD
+#define BASS_PLAY_MOD	0x7AAA
+#define BASS_STOP_MOD	0x7AAB
 
 #define CLEO_VERSION_MAIN    2
 #define CLEO_VERSION_MAJOR   0
