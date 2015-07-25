@@ -23,6 +23,7 @@ int freq = 44100;
 int loop = 0;
 HSTREAM streamHandle;
 HMUSIC musicHandle;
+BOOL isBASSLoaded = FALSE;
 
 eOpcodeResult WINAPI StopMOD(CScript* script)
 {
@@ -64,7 +65,10 @@ eOpcodeResult WINAPI StopStream(CScript* script)
 
 eOpcodeResult WINAPI BassLoader(CScript* script)
 {
-	BASS_Init(device, freq, 0, 0, NULL);
+	if(isBASSLoaded == FALSE) {
+		BASS_Init(device, freq, 0, 0, NULL);
+		isBASSLoaded = TRUE;
+	}
 	return OR_CONTINUE;
 }
 
