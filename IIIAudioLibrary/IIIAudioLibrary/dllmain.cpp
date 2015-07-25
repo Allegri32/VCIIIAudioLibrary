@@ -4,7 +4,6 @@
 #include <stdio.h>
 
 #define BASS_PLAY_STREAM 	0x7AAA
-#define BASS_LOAD	0x7AAB
 #define BASS_STOP_STREAM 0x7AAC
 #define BASS_PLAY_MOD	0x7ABB
 #define BASS_STOP_MOD	0x7AB1
@@ -42,6 +41,11 @@ eOpcodeResult WINAPI PlayMOD(CScript* script)
 	char modpath[100];
 
 	strcpy_s(modpath, Params[0].cVar);
+	
+	if(isBASSLoaded == FALSE) {
+		BASS_Init(device, freq, 0, 0, NULL);
+		isBASSLoaded = TRUE;
+	}
 
 	if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PLAYING) {
 		BASS_ChannelStop(streamHandle);
@@ -63,15 +67,6 @@ eOpcodeResult WINAPI StopStream(CScript* script)
 	return OR_CONTINUE;
 }
 
-eOpcodeResult WINAPI BassLoader(CScript* script)
-{
-	if(isBASSLoaded == FALSE) {
-		BASS_Init(device, freq, 0, 0, NULL);
-		isBASSLoaded = TRUE;
-	}
-	return OR_CONTINUE;
-}
-
 eOpcodeResult WINAPI PlayStream(CScript* script)
 {
 	script->Collect(2);
@@ -81,6 +76,11 @@ eOpcodeResult WINAPI PlayStream(CScript* script)
 	strcpy_s(path, Params[0].cVar); 
 	loop = Params[1].nVar;
 	
+	if(isBASSLoaded == FALSE) {
+		BASS_Init(device, freq, 0, 0, NULL);
+		isBASSLoaded = TRUE;
+	}
+
 	if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PLAYING) {
 		BASS_ChannelStop(streamHandle);
 		streamHandle = NULL;
@@ -108,7 +108,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
 
 		Params = CLEO_GetParamsAddress();
 		Opcodes::RegisterOpcode(BASS_PLAY_STREAM, PlayStream);
-		Opcodes::RegisterOpcode(BASS_LOAD, BassLoader);
 		Opcodes::RegisterOpcode(BASS_STOP_STREAM, StopStream);
 		Opcodes::RegisterOpcode(BASS_PLAY_MOD, PlayMOD);
 		Opcodes::RegisterOpcode(BASS_STOP_MOD, StopMOD);
