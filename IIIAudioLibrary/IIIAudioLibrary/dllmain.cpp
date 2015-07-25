@@ -76,6 +76,11 @@ eOpcodeResult WINAPI PlayStream(CScript* script)
 
 	strcpy_s(path, Params[0].cVar); 
 	loop = Params[1].nVar;
+	
+	if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PLAYING) {
+		BASS_ChannelStop(streamHandle);
+		streamHandle = NULL;
+	}
 
 	streamHandle = BASS_StreamCreateFile(FALSE, path, 0, 0, 0);
 	BASS_ChannelPlay(streamHandle, FALSE);
