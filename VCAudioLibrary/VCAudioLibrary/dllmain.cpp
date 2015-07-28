@@ -84,12 +84,12 @@ eOpcodeResult WINAPI StreamControl(CScript* script)
 	case 1:
 		if(channel == 0)
 		{
-			if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PLAYING)
+			if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PAUSED)
 			{
 				BASS_ChannelPlay(streamHandle, FALSE);
 			}
 		} else {
-			if(BASS_ChannelIsActive(sfxHandle) == BASS_ACTIVE_PLAYING)
+			if(BASS_ChannelIsActive(sfxHandle) == BASS_ACTIVE_PAUSED)
 			{
 				BASS_ChannelPlay(streamHandle, TRUE);
 			}
