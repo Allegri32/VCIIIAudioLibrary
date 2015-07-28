@@ -2,7 +2,7 @@
 	Includes
 */
 
-#include <III.CLEO.h>
+#include <VC.CLEO.h>
 #include <bass.h>
 #include "stdafx.h"
 #include <stdio.h>
@@ -17,6 +17,7 @@
 #define BASS_STOP_MOD	0x7AAB
 #define BASS_PLAY_SFX	0x7AAC
 #define BASS_SET_MOD_POS 0x7ABB
+#define BASS_STREAM_CONTROL	0x7ABC
 
 /*
 	CLEO Version to check
@@ -52,6 +53,50 @@ HSTREAM streamHandle;
 HSTREAM sfxHandle;
 HMUSIC musicHandle;
 BOOL isBASSLoaded = FALSE;
+
+// 7ABC: set_stream_playing_mode channel 0 mode 0
+
+eOpcodeResult WINAPI StreamControl(CScript* script)
+{
+	script->Collect(2);
+
+	int channel = 0;
+	int status = 0;
+
+	channel = Params[0].nVar;
+	status = Params[0].nVar;
+
+	switch(status)
+	{
+	case 0:
+		if(channel == 0)
+		{
+			if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PLAYING)
+			{
+				BASS_ChannelPause(streamHandle);
+			}
+		} else {
+			if(BASS_ChannelIsActive(sfxHandle) == BASS_ACTIVE_PLAYING)
+			{
+				BASS_ChannelPause(sfxHandle);
+			}
+		}
+	case 1:
+		if(channel == 0)
+		{
+			if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PLAYING)
+			{
+				BASS_ChannelPlay(streamHandle, FALSE);
+			}
+		} else {
+			if(BASS_ChannelIsActive(sfxHandle) == BASS_ACTIVE_PLAYING)
+			{
+				BASS_ChannelPlay(streamHandle, TRUE);
+			}
+		}
+	}
+	return OR_CONTINUE;
+}
 
 // 7ABB: set_mod_position 2 2
 
@@ -220,6 +265,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
 		Opcodes::RegisterOpcode(BASS_STOP_MOD, StopMOD);
 		Opcodes::RegisterOpcode(BASS_PLAY_SFX, SFXPlayer);
 		Opcodes::RegisterOpcode(BASS_SET_MOD_POS, SetMODPosition);
+		Opcodes::RegisterOpcode(BASS_STREAM_CONTROL, StreamControl);
 	}
 	return TRUE;
 }

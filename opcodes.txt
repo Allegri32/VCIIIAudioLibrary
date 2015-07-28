@@ -4,3 +4,4 @@
 7AAB: stop_mod_music
 7AAC: play_audio_stream_2channel "Audio\test.wav" loop 1 volume 0.5
 7ABB: set_mod_position 2 2
+7ABC: set_stream_playing_mode channel 0 mode 0
