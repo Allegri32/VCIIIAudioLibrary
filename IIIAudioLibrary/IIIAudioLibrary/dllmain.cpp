@@ -2,7 +2,7 @@
 	Includes
 */
 
-#include <VC.CLEO.h>
+#include <III.CLEO.h>
 #include <bass.h>
 #include "stdafx.h"
 #include <stdio.h>
@@ -26,7 +26,7 @@
 #define CLEO_VERSION_MAIN    2
 #define CLEO_VERSION_MAJOR   0
 #define CLEO_VERSION_MINOR   0
-#define CLEO_VERSION_BINARY  0
+#define CLEO_VERSION_BINARY  3
 
 #define CLEO_VERSION ((CLEO_VERSION_MAIN << 16)|(CLEO_VERSION_MAJOR << 12)|(CLEO_VERSION_MINOR << 8)|(CLEO_VERSION_BINARY))
 
@@ -252,7 +252,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
 	{
 		if (CLEO_GetVersion() < CLEO_VERSION)
 		{
-			MessageBox(HWND_DESKTOP, "Incorrect CLEO Version.\nRequired version 2.0.0.1, Installed version: ," + CLEO_GetVersion(),"AudioPlugin", MB_ICONERROR);
+			MessageBox(HWND_DESKTOP, "Incorrect CLEO Version.\nRequired version 2.0.0.2", "AudioPlugin", MB_ICONERROR);
 			return FALSE;
 		}
 		
@@ -269,3 +269,4 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
 	}
 	return TRUE;
 }
+
