@@ -1,2 +1,3 @@
 # VCIIIAudioLibrary
-An CLEO audio plugin for GTA Vice City and GTA III.
+A CLEO audio plugin for GTA Vice City and GTA III.
+Currently updating project from Visual Studio 2008 to Visual Studio 2010.
