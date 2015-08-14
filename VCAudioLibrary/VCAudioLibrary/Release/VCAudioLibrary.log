@@ -1,7 +1,7 @@
-﻿Build started 13.08.2015 17:28:40.
+﻿Build started 14.08.2015 13:38:10.
      1>Project "C:\Users\Sergiy\Documents\Visual Studio 2008\Projects\VCAudioLibrary\VCAudioLibrary\VCAudioLibrary.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
-         Touching "Release\VCAudioLibrary.unsuccessfulbuild".
+         Creating "Release\VCAudioLibrary.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
          F:\VStudio2010\VC\bin\CL.exe /c /IF:\BASS /I"E:\cleo\III.VC.CLEO-master\CLEO_SDK" /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D _WINDLL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt dllmain.cpp
          dllmain.cpp
@@ -20,4 +20,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.81
+Time Elapsed 00:00:00.78

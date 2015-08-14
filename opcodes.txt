@@ -1,7 +1,7 @@
 0AAC: play_audio_stream "test.mp3" loop 0 volume 0.5 // add the contents of this file at the end of your opcodes.txt file, located in Sanny Builder 3 install directory\data\vc (for vice city) or gta3 (for GTA III)
-0AAD: stop_audio_stream
+0AAD: stop_audio_stream channel 0
 7AAA: play_mod_music "test.mod"
-7AAB: stop_mod_music
+7AAB: stop_mod_music channel 0
 7AAC: play_audio_stream_2channel "Audio\test.wav" loop 1 volume 0.5
 7ABB: set_mod_position 2 2
 7ABC: set_stream_playing_mode channel 0 mode 0

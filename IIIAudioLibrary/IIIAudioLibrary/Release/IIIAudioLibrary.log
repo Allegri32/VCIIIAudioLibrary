@@ -1,4 +1,4 @@
-﻿Build started 13.08.2015 17:31:37.
+﻿Build started 14.08.2015 15:36:45.
      1>Project "C:\Users\Sergiy\Documents\Visual Studio 2008\Projects\IIIAudioLibrary\IIIAudioLibrary\IIIAudioLibrary.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Release\IIIAudioLibrary.unsuccessfulbuild" because "AlwaysCreate" was specified.
@@ -20,4 +20,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.72
+Time Elapsed 00:00:01.38

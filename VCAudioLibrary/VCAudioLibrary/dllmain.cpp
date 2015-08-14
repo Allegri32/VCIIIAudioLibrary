@@ -26,7 +26,7 @@
 #define CLEO_VERSION_MAIN    2
 #define CLEO_VERSION_MAJOR   0
 #define CLEO_VERSION_MINOR   0
-#define CLEO_VERSION_BINARY  3
+#define CLEO_VERSION_BINARY  2
 
 #define CLEO_VERSION ((CLEO_VERSION_MAIN << 16)|(CLEO_VERSION_MAJOR << 12)|(CLEO_VERSION_MINOR << 8)|(CLEO_VERSION_BINARY))
 
@@ -143,6 +143,10 @@ eOpcodeResult WINAPI SFXPlayer(CScript* script)
 
 	sfxHandle = BASS_StreamCreateFile(FALSE, sfxpath, 0, 0, 0);
 	BASS_ChannelPlay(sfxHandle, FALSE);
+
+	if(!BASS_ChannelIsActive(sfxHandle)) {
+		MessageBox(HWND_DESKTOP, "Failed to play audio file.\nCheck the path, and try again.", "AudioPlugin", MB_ICONWARNING);
+	}
 	
 	if(sfxloop == 1) {
 		BASS_ChannelFlags(streamHandle, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP);
@@ -197,15 +201,33 @@ eOpcodeResult WINAPI PlayMOD(CScript* script)
 	return OR_CONTINUE;
 }
 
-// 0AAD: stop_audio_stream
+// 0AAD: stop_audio_stream channel 0
 
 eOpcodeResult WINAPI StopStream(CScript* script)
 {
-	if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PLAYING) {
-		BASS_ChannelStop(streamHandle);
-		streamHandle = NULL;
-		loop = 0;
-	}
+	script->Collect(1);
+
+	int channel;
+
+	channel = Params[0].nVar;
+
+	switch(channel)
+		{
+			case 0:
+				if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PLAYING) {
+					BASS_ChannelStop(streamHandle);
+					streamHandle = NULL;
+					loop = 0;
+				}
+			case 1:
+				if(BASS_ChannelIsActive(sfxHandle) == BASS_ACTIVE_PLAYING) {
+					BASS_ChannelStop(sfxHandle);
+					BASS_StreamFree(sfxHandle);
+					sfxHandle = NULL;
+					sfxloop = 0;
+				}
+		}
+
 	return OR_CONTINUE;
 }
 
@@ -234,6 +256,10 @@ eOpcodeResult WINAPI PlayStream(CScript* script)
 
 	streamHandle = BASS_StreamCreateFile(FALSE, path, 0, 0, 0);
 	BASS_ChannelPlay(streamHandle, FALSE);
+
+	if(!BASS_ChannelIsActive(streamHandle)) {
+		MessageBox(HWND_DESKTOP, "Failed to play audio file.\nCheck the path, and try again.", "AudioPlugin", MB_ICONWARNING);
+	}
 
 	if(loop == 1) {
 		BASS_ChannelFlags(streamHandle, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP);
