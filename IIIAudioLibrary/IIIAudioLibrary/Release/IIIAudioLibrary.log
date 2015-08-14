@@ -1,11 +1,11 @@
-﻿Build started 14.08.2015 15:36:45.
+﻿Build started 14.08.2015 21:08:21.
      1>Project "C:\Users\Sergiy\Documents\Visual Studio 2008\Projects\IIIAudioLibrary\IIIAudioLibrary\IIIAudioLibrary.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Release\IIIAudioLibrary.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
          F:\VStudio2010\VC\bin\CL.exe /c /IF:\BASS /I"E:\cleo\III.VC.CLEO-master\CLEO_SDK" /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D _WINDLL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt dllmain.cpp
          dllmain.cpp
-     1>E:\cleo\III.VC.CLEO-master\CLEO_SDK\III.CLEO.h(28): warning C4341: 'OR_UNDEFINED' : signed value is out of range for enum constant
+     1>E:\cleo\III.VC.CLEO-master\CLEO_SDK\VC.CLEO.h(28): warning C4341: 'OR_UNDEFINED' : signed value is out of range for enum constant
        Link:
          F:\VStudio2010\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Sergiy\Documents\Visual Studio 2008\Projects\IIIAudioLibrary\Release\IIIAudioLibrary.dll" /NOLOGO /LIBPATH:F:\BASS /LIBPATH:"E:\cleo\III.VC.CLEO-master\CLEO_SDK" III.CLEO.lib bass.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\IIIAudioLibrary.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\Sergiy\Documents\Visual Studio 2008\Projects\IIIAudioLibrary\Release\IIIAudioLibrary.pdb" /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Sergiy\Documents\Visual Studio 2008\Projects\IIIAudioLibrary\Release\IIIAudioLibrary.lib" /MACHINE:X86 /DLL Release\dllmain.obj
          Generating code
@@ -20,4 +20,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.38
+Time Elapsed 00:00:00.99

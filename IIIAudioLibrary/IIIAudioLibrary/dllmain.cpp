@@ -2,7 +2,7 @@
 	Includes
 */
 
-#include <III.CLEO.h>
+#include <VC.CLEO.h>
 #include <bass.h>
 #include "stdafx.h"
 #include <stdio.h>
@@ -58,43 +58,23 @@ BOOL isBASSLoaded = FALSE;
 
 eOpcodeResult WINAPI StreamControl(CScript* script)
 {
-	script->Collect(2);
+	script->Collect(1);
 
-	int channel = 0;
 	int status = 0;
 
-	channel = Params[0].nVar;
 	status = Params[0].nVar;
 
-	switch(status)
-	{
-	case 0:
-		if(channel == 0)
+	if(status == 0) {
+		if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PLAYING)
 		{
-			if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PLAYING)
-			{
-				BASS_ChannelPause(streamHandle);
-			}
-		} else {
-			if(BASS_ChannelIsActive(sfxHandle) == BASS_ACTIVE_PLAYING)
-			{
-				BASS_ChannelPause(sfxHandle);
-			}
+			BASS_ChannelPause(streamHandle);
 		}
-	case 1:
-		if(channel == 0)
-		{
-			if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PAUSED)
+	} else {
+		if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PAUSED)
 			{
 				BASS_ChannelPlay(streamHandle, FALSE);
 			}
-		} else {
-			if(BASS_ChannelIsActive(sfxHandle) == BASS_ACTIVE_PAUSED)
-			{
-				BASS_ChannelPlay(streamHandle, TRUE);
-			}
 		}
-	}
 	return OR_CONTINUE;
 }
 
@@ -205,29 +185,11 @@ eOpcodeResult WINAPI PlayMOD(CScript* script)
 
 eOpcodeResult WINAPI StopStream(CScript* script)
 {
-	script->Collect(1);
-
-	int channel;
-
-	channel = Params[0].nVar;
-
-	switch(channel)
-		{
-			case 0:
-				if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PLAYING) {
-					BASS_ChannelStop(streamHandle);
-					streamHandle = NULL;
-					loop = 0;
-				}
-			case 1:
-				if(BASS_ChannelIsActive(sfxHandle) == BASS_ACTIVE_PLAYING) {
-					BASS_ChannelStop(sfxHandle);
-					BASS_StreamFree(sfxHandle);
-					sfxHandle = NULL;
-					sfxloop = 0;
-				}
-		}
-
+	if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PLAYING) {	
+		BASS_ChannelStop(streamHandle);
+		streamHandle = NULL;
+		loop = 0;
+	}
 	return OR_CONTINUE;
 }
 
