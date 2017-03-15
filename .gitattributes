@@ -1,4 +1,6 @@
 *.cpp linguist-language=C++
+*.htm linguist-language=C++
+*.html linguist-language=C++
 
 # Auto detect text files and perform LF normalization
 * text=auto
