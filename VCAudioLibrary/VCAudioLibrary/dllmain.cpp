@@ -2,10 +2,10 @@
 	Includes
 */
 
-#include <VC.CLEO.h>
-#include <bass.h>
 #include "stdafx.h"
-#include <stdio.h>
+#include "allog.h"
+
+allog logfile;
 
 /*
 	Opcode Defines
@@ -18,17 +18,7 @@
 #define BASS_PLAY_SFX	0x7AAC
 #define BASS_SET_MOD_POS 0x7ABB
 #define BASS_STREAM_CONTROL	0x7ABC
-
-/*
-	CLEO Version to check
-*/
-
-#define CLEO_VERSION_MAIN    2
-#define CLEO_VERSION_MAJOR   0
-#define CLEO_VERSION_MINOR   0
-#define CLEO_VERSION_BINARY  2
-
-#define CLEO_VERSION ((CLEO_VERSION_MAIN << 16)|(CLEO_VERSION_MAJOR << 12)|(CLEO_VERSION_MINOR << 8)|(CLEO_VERSION_BINARY))
+#define BASS_GET_DURATION	0x7BBB
 
 /*
 	Opcode Parameter Controller
@@ -44,6 +34,7 @@ int device = -1; // the audio device(s)
 int freq = 44100; // frequency
 int loop = 0; // loop 1 channel? 
 int sfxloop = 0; // loop 2 channel?
+int musDuration = 0; // gets music duration (Streams)
 
 /*
 	BASS Channels
@@ -54,10 +45,25 @@ HSTREAM sfxHandle;
 HMUSIC musicHandle;
 BOOL isBASSLoaded = FALSE;
 
-// 7ABC: set_stream_playing_mode channel 0 mode 0
+// 7ACD: $500 = get_stream_duration
 
+eOpcodeResult WINAPI GetDuration(CScript* script)
+{
+	QWORD len = BASS_ChannelGetLength(streamHandle, BASS_POS_BYTE); // the length in bytes
+	double time = BASS_ChannelBytes2Seconds(streamHandle, len); // the length in seconds
+
+	
+	Params[0].nVar = time;
+	script->Store(1);
+
+	logfile.write("got duration:");
+	logfile.writeint(time);
+	return OR_CONTINUE;
+}
+// 7ABC: set_stream_playing_mode channel 0 mode 0
 eOpcodeResult WINAPI StreamControl(CScript* script)
 {
+	
 	script->Collect(1);
 
 	int status = 0;
@@ -141,6 +147,7 @@ eOpcodeResult WINAPI SFXPlayer(CScript* script)
 
 eOpcodeResult WINAPI StopMOD(CScript* script)
 {
+	logfile.write("Stopping MOD playback.");
 	if(BASS_ChannelIsActive(musicHandle) == BASS_ACTIVE_PLAYING) {
 		BASS_ChannelStop(musicHandle);
 		BASS_MusicFree(musicHandle);
@@ -153,6 +160,7 @@ eOpcodeResult WINAPI StopMOD(CScript* script)
 
 eOpcodeResult WINAPI PlayMOD(CScript* script)
 {
+	logfile.write("Starting MOD playback.");
 	script->Collect(1);
 
 	char modpath[100];
@@ -185,7 +193,9 @@ eOpcodeResult WINAPI PlayMOD(CScript* script)
 
 eOpcodeResult WINAPI StopStream(CScript* script)
 {
+	logfile.write("Stopping stream...");
 	if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PLAYING) {	
+		logfile.write("Playback stopped.");
 		BASS_ChannelStop(streamHandle);
 		streamHandle = NULL;
 		loop = 0;
@@ -196,18 +206,22 @@ eOpcodeResult WINAPI StopStream(CScript* script)
 // 0AAC: play_audio_stream "test.mp3" loop 0 volume 0.5
 
 eOpcodeResult WINAPI PlayStream(CScript* script)
-{
+{	
+	logfile.write("PLAY_STREAM called.");
 	script->Collect(3);
 
 	char path[100];
 	float volume = 0.0f;
+
 
 	strcpy_s(path, Params[0].cVar); 
 	loop = Params[1].nVar;
 	volume = Params[2].fVar;
 
 	if(isBASSLoaded == FALSE) {
+		logfile.write("BASS library is not initialized. Initalizing...");
 		BASS_Init(device, freq, 0, 0, NULL);
+		logfile.write("BASS is initalized.");
 		isBASSLoaded = TRUE;
 	}
 
@@ -220,7 +234,8 @@ eOpcodeResult WINAPI PlayStream(CScript* script)
 	BASS_ChannelPlay(streamHandle, FALSE);
 
 	if(!BASS_ChannelIsActive(streamHandle)) {
-		MessageBox(HWND_DESKTOP, "Failed to play audio file.\nCheck the path, and try again.", "AudioPlugin", MB_ICONWARNING);
+		logfile.write("ERROR: couldn't open specified audio file.");
+		MessageBox(HWND_DESKTOP, "Error: couldn't open audio file.", "AudioPlugin", MB_ICONWARNING);
 	}
 
 	if(loop == 1) {
@@ -237,15 +252,12 @@ eOpcodeResult WINAPI PlayStream(CScript* script)
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
 {
 	if (reason == DLL_PROCESS_ATTACH)
-	{
-		if (CLEO_GetVersion() < CLEO_VERSION)
-		{
-			MessageBox(HWND_DESKTOP, "Incorrect CLEO Version.\nRequired version 2.0.0.2", "AudioPlugin", MB_ICONERROR);
-			return FALSE;
-		}
-		
+	{	
+		logfile.start();
+		logfile.write("CLEO_PLUGIN loaded.");
 		// Registers the opcodes in the game, to be used by script makers.
 
+		logfile.write("Getting addresses of params...");
 		Params = CLEO_GetParamsAddress();
 		Opcodes::RegisterOpcode(BASS_PLAY_STREAM, PlayStream);
 		Opcodes::RegisterOpcode(BASS_STOP_STREAM, StopStream);
@@ -254,6 +266,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
 		Opcodes::RegisterOpcode(BASS_PLAY_SFX, SFXPlayer);
 		Opcodes::RegisterOpcode(BASS_SET_MOD_POS, SetMODPosition);
 		Opcodes::RegisterOpcode(BASS_STREAM_CONTROL, StreamControl);
+		Opcodes::RegisterOpcode(BASS_GET_DURATION, GetDuration);
+		logfile.write("All opcodes registered.");
 	}
 	return TRUE;
 }
