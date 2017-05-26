@@ -6,6 +6,8 @@
 #include "allog.h"
 
 allog logfile;
+BYTE    *IsMenuActive = (BYTE *)0x869668; // code snippet by Shagg_E
+BYTE    *Menu = (BYTE *)0x703997;
 
 /*
 	Opcode Defines
@@ -67,20 +69,42 @@ eOpcodeResult WINAPI StreamControl(CScript* script)
 	script->Collect(1);
 
 	int status = 0;
+	int channel = 0;
 
 	status = Params[0].nVar;
+	channel = Params[1].nVar;
 
-	if(status == 0) {
-		if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PLAYING)
-		{
-			BASS_ChannelPause(streamHandle);
+	switch (channel)
+	{
+	case 0:
+		if (status == 0) {
+			if (BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PLAYING)
+			{
+				BASS_ChannelPause(streamHandle);
+			}
 		}
-	} else {
-		if(BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PAUSED)
+		else {
+			if (BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PAUSED)
 			{
 				BASS_ChannelPlay(streamHandle, FALSE);
 			}
 		}
+		break;
+	case 1:
+		if (status == 0) {
+			if (BASS_ChannelIsActive(sfxHandle) == BASS_ACTIVE_PLAYING)
+			{
+				BASS_ChannelPause(sfxHandle);
+			}
+		}
+		else {
+			if (BASS_ChannelIsActive(sfxHandle) == BASS_ACTIVE_PAUSED)
+			{
+				BASS_ChannelPlay(sfxHandle, FALSE);
+			}
+		}
+		break;
+	}
 	return OR_CONTINUE;
 }
 
@@ -205,6 +229,7 @@ eOpcodeResult WINAPI StopStream(CScript* script)
 
 // 0AAC: play_audio_stream "test.mp3" loop 0 volume 0.5
 
+
 eOpcodeResult WINAPI PlayStream(CScript* script)
 {	
 	logfile.write("PLAY_STREAM called.");
@@ -249,6 +274,32 @@ eOpcodeResult WINAPI PlayStream(CScript* script)
 
 // DLL Main Method
 
+bool timerrun = false;
+
+void MainLoop()
+{
+	if (timerrun == false)
+	{
+		timerrun = true;
+		logfile.write("MainLoop started.");
+		logfile.writeint(*Menu);
+	}
+	
+	if (*IsMenuActive == 1)
+	{
+		if (BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PLAYING)
+		{
+			BASS_ChannelPause(streamHandle);
+		}
+	}
+	else {
+		if (BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PAUSED)
+		{
+			BASS_ChannelPlay(streamHandle, false);
+		}
+	}
+}
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
 {
 	if (reason == DLL_PROCESS_ATTACH)
@@ -268,7 +319,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved)
 		Opcodes::RegisterOpcode(BASS_STREAM_CONTROL, StreamControl);
 		Opcodes::RegisterOpcode(BASS_GET_DURATION, GetDuration);
 		logfile.write("All opcodes registered.");
+
+		SetTimer(0, 0, 0, (TIMERPROC)MainLoop);
 	}
 	return TRUE;
-}
+} 
 
