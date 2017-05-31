@@ -8,7 +8,8 @@
 allog logfile;
 BYTE    *IsMenuActive = (BYTE *)0x869668; // code snippet by Shagg_E
 BYTE    *Menu = (BYTE *)0x703997;
-
+int *MenuID = (int *)0x703997;
+float *LoadProgress = (float *)0xA0CE94;
 /*
 	Opcode Defines
 */
@@ -155,7 +156,14 @@ eOpcodeResult WINAPI SFXPlayer(CScript* script)
 	BASS_ChannelPlay(sfxHandle, FALSE);
 
 	if(!BASS_ChannelIsActive(sfxHandle)) {
-		MessageBox(HWND_DESKTOP, "Failed to play audio file.\nCheck the path, and try again.", "AudioPlugin", MB_ICONWARNING);
+		logfile.write("ERROR: couldn't open specified audio file.");
+		logfile.write("Error_ID:");
+		logfile.writeint(BASS_ErrorGetCode());
+		sfxHandle = BASS_StreamCreateFile(FALSE, "AudioLibrary\\Placeholder.wav", 0, 0, 0);
+		logfile.writeint(BASS_ErrorGetCode());
+		BASS_ChannelFlags(sfxHandle, 0, BASS_SAMPLE_LOOP);
+		BASS_ChannelPlay(sfxHandle, FALSE);
+		
 	}
 	
 	if(sfxloop == 1) {
@@ -260,7 +268,13 @@ eOpcodeResult WINAPI PlayStream(CScript* script)
 
 	if(!BASS_ChannelIsActive(streamHandle)) {
 		logfile.write("ERROR: couldn't open specified audio file.");
-		MessageBox(HWND_DESKTOP, "Error: couldn't open audio file.", "AudioPlugin", MB_ICONWARNING);
+		logfile.write("Error_ID:");
+		logfile.writeint(BASS_ErrorGetCode());
+		streamHandle = BASS_StreamCreateFile(FALSE, "AudioLibrary\\Placeholder.wav", 0, 0, 0);
+		logfile.writeint(BASS_ErrorGetCode());
+		BASS_ChannelFlags(streamHandle, 0, BASS_SAMPLE_LOOP);
+		BASS_ChannelPlay(streamHandle, FALSE);
+		// that sound can be preety annoying, if looped endlessly
 	}
 
 	if(loop == 1) {
@@ -284,7 +298,7 @@ void MainLoop()
 		logfile.write("MainLoop started.");
 		logfile.writeint(*Menu);
 	}
-	
+
 	if (*IsMenuActive == 1)
 	{
 		if (BASS_ChannelIsActive(streamHandle) == BASS_ACTIVE_PLAYING)
